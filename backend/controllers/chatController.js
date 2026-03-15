@@ -70,8 +70,36 @@ const sendMessage = async (req, res) => {
             neoMessage
         });
     } catch (error) {
-        console.error('Error sending message:', error);
-        res.status(500).json({ message: 'Server error while sending message' });
+        console.error('--- CHAT ERROR START ---');
+        console.error('Message:', error.message);
+        
+        // Check if it's a MongoDB error
+        if (error.name === 'MongooseServerSelectionError' || error.message.includes('buffering timed out')) {
+            console.error('DATABASE ERROR: MongoDB connection failed.');
+            
+            // If DB is down, we can still try to get the AI response without saving to DB
+            try {
+                const chatSession = model.startChat({ history: [] });
+                const result = await chatSession.sendMessage(req.body.text);
+                const neoText = result.response.text();
+                
+                return res.status(200).json({
+                    userMessage: { role: 'user', text: req.body.text, timestamp: new Date() },
+                    neoMessage: { role: 'neo', text: neoText, timestamp: new Date() },
+                    warning: "Database offline. History not saved."
+                });
+            } catch (aiError) {
+                console.error('AI Error during DB fallback:', aiError.message);
+            }
+        }
+
+        console.error('Status:', error.status);
+        if (error.response) {
+            console.error('Response Data:', error.response.data);
+        }
+        console.error('Full Error Object:', JSON.stringify(error, null, 2));
+        console.error('--- CHAT ERROR END ---');
+        res.status(500).json({ message: 'Server error while sending message', details: error.message });
     }
 };
 
