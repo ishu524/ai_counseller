@@ -90,8 +90,8 @@ const ChatPage = () => {
             
             // To test endpoints locally without auth middleware blocking us, 
             // you might temporarily need to bypass auth in backend if you aren't logging in first.
-            // For now, we will assume you have a token or we just make the request.
-            const response = await axios.post('http://localhost:5000/api/chat/send', 
+            const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+            const response = await axios.post(`${apiUrl}/api/chat/send`, 
                 { text: currentInput },
                 { 
                     headers: { 
