@@ -21,7 +21,6 @@ export const Navbar = () => {
     const navLinks = [
         { name: 'Home', path: '/' },
         { name: 'Chat', path: '/chat' },
-        { name: 'Dashboard', path: '/dashboard' },
         { name: 'About', path: '/about' },
     ];
 
@@ -84,8 +83,8 @@ export const Navbar = () => {
                         >
                             {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
                         </motion.button>
-                        <Link to="/login">
-                            <Button variant="primary" size="sm" className="px-8 shadow-xl shadow-primary/20">Get Started</Button>
+                        <Link to="/chat">
+                            <Button variant="primary" size="sm" className="px-8 shadow-xl shadow-primary/20">Chat Now</Button>
                         </Link>
                     </div>
                 </div>
@@ -125,8 +124,8 @@ export const Navbar = () => {
                                 </Link>
                             ))}
                             <div className="pt-4">
-                                <Link to="/login" onClick={() => setIsOpen(false)}>
-                                    <Button className="w-full py-5 text-xl">Get Started</Button>
+                                <Link to="/chat" onClick={() => setIsOpen(false)}>
+                                    <Button className="w-full py-5 text-xl">Chat Now</Button>
                                 </Link>
                             </div>
                         </div>
@@ -162,7 +161,6 @@ export const Footer = () => {
                         <h4 className="font-black text-xs uppercase tracking-[0.2em] mb-8 text-primary">Platform</h4>
                         <ul className="space-y-4 text-sm font-bold text-muted-foreground">
                             <li><Link to="/chat" className="hover:text-primary transition-colors">AI Reflection</Link></li>
-                            <li><Link to="/dashboard" className="hover:text-primary transition-colors">Mood Insights</Link></li>
                             <li><Link to="/about" className="hover:text-primary transition-colors">Our Ethos</Link></li>
                         </ul>
                     </div>

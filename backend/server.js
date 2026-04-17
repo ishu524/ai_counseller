@@ -45,6 +45,33 @@ app.use((err, req, res, next) => {
 
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-});
+const startServer = (port) => {
+    const server = app.listen(port, () => {
+        console.log(`Server running on port ${port}`);
+    }).on('error', (err) => {
+        if (err.code === 'EADDRINUSE') {
+            console.log(`Port ${port} is busy. Clearing it for you...`);
+            const { exec } = require('child_process');
+            // Forcefully kill any process on this port (cross-platform compatible)
+            const command = process.platform === 'win32' 
+                ? `npx -y kill-port ${port}` 
+                : `lsof -ti:${port} | xargs kill -9`;
+            
+            exec(command, (killErr) => {
+                if (killErr) {
+                    console.error(`Could not clear port ${port}:`, killErr.message);
+                    console.log(`PERMANENT FIX: Please run 'npm run dev' instead of 'nodemon server.js'`);
+                    process.exit(1);
+                } else {
+                    console.log(`Port ${port} cleared. Restarting now...`);
+                    // Small delay to ensure port is released by OS
+                    setTimeout(() => startServer(port), 1000);
+                }
+            });
+        } else {
+            console.error('Server error:', err);
+        }
+    });
+};
+
+startServer(PORT);

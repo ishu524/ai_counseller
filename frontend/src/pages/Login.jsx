@@ -18,14 +18,29 @@ const LoginPage = () => {
         return newErrors;
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         const newErrors = validate();
         if (Object.keys(newErrors).length === 0) {
             setLoading(true);
-            setTimeout(() => {
+            try {
+                const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+                const { data } = await axios.post(`${apiUrl}/api/auth/login`, formData);
+                
+                // Store user data and token
+                localStorage.setItem('token', data.token);
+                localStorage.setItem('user', JSON.stringify({ 
+                    id: data._id, 
+                    name: data.name, 
+                    email: data.email 
+                }));
+                
                 navigate('/dashboard');
-            }, 1000);
+            } catch (err) {
+                setErrors({ server: err.response?.data?.message || 'Login failed. Please try again.' });
+            } finally {
+                setLoading(false);
+            }
         } else {
             setErrors(newErrors);
         }

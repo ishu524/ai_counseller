@@ -21,14 +21,33 @@ const SignupPage = () => {
         return newErrors;
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         const newErrors = validate();
         if (Object.keys(newErrors).length === 0) {
             setLoading(true);
-            setTimeout(() => {
+            try {
+                const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+                const { data } = await axios.post(`${apiUrl}/api/auth/register`, {
+                    name: formData.name,
+                    email: formData.email,
+                    password: formData.password
+                });
+                
+                // Store user data and token correctly
+                localStorage.setItem('token', data.token);
+                localStorage.setItem('user', JSON.stringify({ 
+                    id: data._id, 
+                    name: data.name, 
+                    email: data.email 
+                }));
+                
                 navigate('/dashboard');
-            }, 1000);
+            } catch (err) {
+                setErrors({ server: err.response?.data?.message || 'Registration failed. Please try again.' });
+            } finally {
+                setLoading(false);
+            }
         } else {
             setErrors(newErrors);
         }

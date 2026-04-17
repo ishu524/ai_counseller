@@ -9,9 +9,6 @@ import { Button, Card } from './components/UI';
 // Pages
 import Home from './pages/Home';
 import Chat from './pages/Chat';
-import Dashboard from './pages/Dashboard';
-import Login from './pages/Login';
-import Signup from './pages/Signup';
 import About from './pages/About';
 import Privacy from './pages/Privacy';
 import Contact from './pages/Contact';
@@ -144,9 +141,6 @@ function App() {
           <Routes location={location} key={location.pathname}>
             <Route path="/" element={<PageWrapper><Home /></PageWrapper>} />
             <Route path="/chat" element={<PageWrapper><Chat /></PageWrapper>} />
-            <Route path="/dashboard" element={<PageWrapper><Dashboard /></PageWrapper>} />
-            <Route path="/login" element={<PageWrapper><Login /></PageWrapper>} />
-            <Route path="/signup" element={<PageWrapper><Signup /></PageWrapper>} />
             <Route path="/about" element={<PageWrapper><About /></PageWrapper>} />
             <Route path="/privacy" element={<PageWrapper><Privacy /></PageWrapper>} />
             <Route path="/contact" element={<PageWrapper><Contact /></PageWrapper>} />

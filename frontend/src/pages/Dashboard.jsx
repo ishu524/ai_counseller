@@ -17,11 +17,14 @@ const DashboardPage = () => {
         { date: 'Oct 22', title: 'Decision on final project', type: 'Reflective' },
         { date: 'Oct 20', title: 'Morning anxiety check-in', type: 'Calming' },
     ];
+    
+    const userStr = localStorage.getItem('user');
+    const user = userStr ? JSON.parse(userStr) : { name: 'Alex' };
 
     return (
         <div className="container mx-auto px-6 py-8 space-y-12">
             <header className="space-y-2">
-                <h1 className="text-3xl font-bold">Good morning, Alex</h1>
+                <h1 className="text-3xl font-bold">Good morning, {user.name}</h1>
                 <p className="text-muted-foreground">Here's a look at your wellness journey this week.</p>
             </header>
 

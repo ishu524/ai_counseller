@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Send, User, Bot, AlertCircle, RefreshCw } from 'lucide-react';
 import { Button, Card, Input } from '../components/UI';
@@ -56,6 +57,8 @@ const TypingIndicator = () => (
 );
 
 const ChatPage = () => {
+    const navigate = useNavigate();
+    
     const [messages, setMessages] = useState([
         { text: "Hello! I'm Neo, your AI counsellor. I'm here to listen and help you reflect. How are you feeling today?", isAI: true, timestamp: Date.now() }
     ]);
@@ -63,6 +66,28 @@ const ChatPage = () => {
     const [isTyping, setIsTyping] = useState(false);
     const [showDisclaimer, setShowDisclaimer] = useState(true);
     const messagesEndRef = useRef(null);
+
+    useEffect(() => {
+        const fetchHistory = async () => {
+            try {
+                const guestId = "605c721c430e5218d867abc1";
+                const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+                const { data } = await axios.get(`${apiUrl}/api/chat/history/${guestId}`, {
+                    headers: { Authorization: `Bearer guest_token` }
+                });
+                if (data.messages && data.messages.length > 0) {
+                    setMessages(data.messages.map(m => ({
+                        text: m.text,
+                        isAI: m.role === 'neo',
+                        timestamp: m.timestamp || Date.now()
+                    })));
+                }
+            } catch (err) {
+                console.error("Failed to load history:", err);
+            }
+        };
+        fetchHistory();
+    }, []);
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -81,21 +106,15 @@ const ChatPage = () => {
         const currentInput = input;
         setInput('');
 
-        // Real AI Integration
+        // Guest AI Integration
         setIsTyping(true);
         try {
-            // NOTE: Using a hardcoded mock token for demo purposes if not logged in.
-            // In a real app, you would get this from Context/LocalStorage
-            const mockToken = localStorage.getItem('token') || "mock_token_for_testing"; 
-            
-            // To test endpoints locally without auth middleware blocking us, 
-            // you might temporarily need to bypass auth in backend if you aren't logging in first.
             const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
             const response = await axios.post(`${apiUrl}/api/chat/send`, 
                 { text: currentInput },
                 { 
                     headers: { 
-                        Authorization: `Bearer ${mockToken}` 
+                        Authorization: `Bearer guest_token` 
                     } 
                 }
             );
@@ -110,8 +129,9 @@ const ChatPage = () => {
             }
         } catch (error) {
             console.error("Chat API Error:", error);
+            const errorMessage = error.response?.data?.details || error.response?.data?.message || "I'm sorry, I'm having trouble connecting to my thought processes right now. Please try again or make sure the server is running.";
             const errorResponse = { 
-                text: "I'm sorry, I'm having trouble connecting to my thought processes right now. Please try again or make sure you are logged in.", 
+                text: errorMessage, 
                 isAI: true, 
                 timestamp: Date.now() 
             };
